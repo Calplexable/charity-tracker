@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Charity Tracker{% endblock %}
+
+{% block content %}
+<h1>Dashboard</h1>
+
+<div class="stat-grid">
+    <div class="stat-card">
+        <span class="stat-number">{{ stats.people_count }}</span>
+        <span class="stat-label">People tracked</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-number">{{ "%.1f"|format(stats.total_hours) }}</span>
+        <span class="stat-label">Total volunteer hours</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-number">£{{ "%.2f"|format(stats.total_donations) }}</span>
+        <span class="stat-label">Total donations</span>
+    </div>
+</div>
+
+<div class="two-col">
+    <section aria-labelledby="top-volunteers-heading">
+        <h2 id="top-volunteers-heading">Top volunteers</h2>
+        {% if top_volunteers and top_volunteers[0].total_hours > 0 %}
+        <ol class="leaderboard">
+            {% for v in top_volunteers %}
+            {% if v.total_hours > 0 %}
+            <li>
+                <a href="{{ url_for('person_detail', person_id=v.person_id) }}">{{ v.name }}</a>
+                <span class="leaderboard-value">{{ "%.1f"|format(v.total_hours) }} hrs</span>
+            </li>
+            {% endif %}
+            {% endfor %}
+        </ol>
+        {% else %}
+        <p class="empty-state">No volunteer hours logged yet. <a href="{{ url_for('hours_list') }}">Log some hours</a>.</p>
+        {% endif %}
+    </section>
+
+    <section aria-labelledby="top-donors-heading">
+        <h2 id="top-donors-heading">Top donors</h2>
+        {% if top_donors and top_donors[0].total_donated > 0 %}
+        <ol class="leaderboard">
+            {% for d in top_donors %}
+            {% if d.total_donated > 0 %}
+            <li>
+                <a href="{{ url_for('person_detail', person_id=d.person_id) }}">{{ d.name }}</a>
+                <span class="leaderboard-value">£{{ "%.2f"|format(d.total_donated) }}</span>
+            </li>
+            {% endif %}
+            {% endfor %}
+        </ol>
+        {% else %}
+        <p class="empty-state">No donations logged yet. <a href="{{ url_for('donations_list') }}">Log a donation</a>.</p>
+        {% endif %}
+    </section>
+</div>
+
+<div class="two-col">
+    <section aria-labelledby="recent-hours-heading">
+        <h2 id="recent-hours-heading">Recent volunteer hours</h2>
+        {% if recent_hours %}
+        <ul class="recent-list">
+            {% for h in recent_hours %}
+            <li>
+                <strong>{{ h.person_name }}</strong> logged {{ "%.1f"|format(h.hours) }}h — {{ h.activity }}
+                <span class="recent-date">{{ h.date_logged }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="empty-state">Nothing logged yet.</p>
+        {% endif %}
+    </section>
+
+    <section aria-labelledby="recent-donations-heading">
+        <h2 id="recent-donations-heading">Recent donations</h2>
+        {% if recent_donations %}
+        <ul class="recent-list">
+            {% for d in recent_donations %}
+            <li>
+                <strong>{{ d.person_name }}</strong> donated £{{ "%.2f"|format(d.amount) }}
+                <span class="recent-date">{{ d.date_received }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="empty-state">Nothing logged yet.</p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

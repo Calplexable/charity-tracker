@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Volunteer hours — Charity Tracker{% endblock %}
+
+{% block content %}
+<h1>Volunteer hours</h1>
+
+{% if not people %}
+<p class="empty-state">You need to <a href="{{ url_for('people_list') }}">add a person</a> before logging hours.</p>
+{% else %}
+<section class="add-form" aria-labelledby="log-hours-heading">
+    <h2 id="log-hours-heading">Log hours</h2>
+    <form method="post" action="{{ url_for('hours_add') }}">
+        <div class="field-row">
+            <div class="field">
+                <label for="person_id">Person</label>
+                <select id="person_id" name="person_id" required>
+                    {% for person in people %}
+                    <option value="{{ person.id }}">{{ person.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field">
+                <label for="hours">Hours</label>
+                <input type="number" id="hours" name="hours" step="0.25" min="0.25" required>
+            </div>
+            <div class="field">
+                <label for="date_logged">Date</label>
+                <input type="date" id="date_logged" name="date_logged" value="{{ today }}" required>
+            </div>
+        </div>
+        <div class="field">
+            <label for="activity">Activity</label>
+            <input type="text" id="activity" name="activity" placeholder="e.g. Sorting donations at the warehouse" required>
+        </div>
+        <div class="field">
+            <label for="notes">Notes (optional)</label>
+            <input type="text" id="notes" name="notes">
+        </div>
+        <button type="submit">Log hours</button>
+    </form>
+</section>
+{% endif %}
+
+<section aria-labelledby="hours-list-heading">
+    <h2 id="hours-list-heading">All entries ({{ hours|length }})</h2>
+    {% if hours %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Person</th>
+                <th scope="col">Activity</th>
+                <th scope="col">Hours</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for h in hours %}
+            <tr>
+                <td>{{ h.date_logged }}</td>
+                <td><a href="{{ url_for('person_detail', person_id=h.person_id) }}">{{ h.person_name }}</a></td>
+                <td>{{ h.activity }}</td>
+                <td>{{ "%.1f"|format(h.hours) }}</td>
+                <td>
+                    <form method="post" action="{{ url_for('hours_delete', entry_id=h.id) }}" class="inline-form"
+                          onsubmit="return confirm('Remove this entry?');">
+                        <button type="submit" class="btn-danger">Remove</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty-state">No hours logged yet.</p>
+    {% endif %}
+</section>
+{% endblock %}

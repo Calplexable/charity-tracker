@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}People — Charity Tracker{% endblock %}
+
+{% block content %}
+<h1>People</h1>
+
+<section class="add-form" aria-labelledby="add-person-heading">
+    <h2 id="add-person-heading">Add a person</h2>
+    <form method="post" action="{{ url_for('people_add') }}">
+        <div class="field-row">
+            <div class="field">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="field">
+                <label for="email">Email (optional)</label>
+                <input type="email" id="email" name="email">
+            </div>
+        </div>
+        <div class="field">
+            <label for="notes">Notes (optional)</label>
+            <input type="text" id="notes" name="notes">
+        </div>
+        <button type="submit">Add person</button>
+    </form>
+</section>
+
+<section aria-labelledby="people-list-heading">
+    <h2 id="people-list-heading">All people ({{ people|length }})</h2>
+    {% if people %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Notes</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for person in people %}
+            <tr>
+                <td><a href="{{ url_for('person_detail', person_id=person.id) }}">{{ person.name }}</a></td>
+                <td>{{ person.email or "—" }}</td>
+                <td>{{ person.notes or "—" }}</td>
+                <td>
+                    <form method="post" action="{{ url_for('people_delete', person_id=person.id) }}" class="inline-form"
+                          onsubmit="return confirm('Remove {{ person.name }}? This also deletes their logged hours and donations.');">
+                        <button type="submit" class="btn-danger">Remove</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty-state">No one added yet. Add your first person above.</p>
+    {% endif %}
+</section>
+{% endblock %}

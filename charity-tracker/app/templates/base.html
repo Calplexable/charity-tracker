@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Charity Tracker{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+
+    <header class="site-header">
+        <div class="wrap header-inner">
+            <a class="brand" href="{{ url_for('dashboard') }}">Charity Tracker</a>
+            <nav aria-label="Main navigation">
+                <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.path == url_for('dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('people_list') }}" class="{{ 'active' if request.path == url_for('people_list') }}">People</a>
+                <a href="{{ url_for('hours_list') }}" class="{{ 'active' if request.path == url_for('hours_list') }}">Volunteer hours</a>
+                <a href="{{ url_for('donations_list') }}" class="{{ 'active' if request.path == url_for('donations_list') }}">Donations</a>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main-content" class="wrap">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                <div class="flash flash-{{ category }}" role="alert">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="wrap">
+            <p>Charity Tracker — open source on <a href="https://github.com/Calplexable/charity-tracker">GitHub</a>.</p>
+        </div>
+    </footer>
+</body>
+</html>

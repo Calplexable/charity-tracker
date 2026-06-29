@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}{{ person.name }} — Charity Tracker{% endblock %}
+
+{% block content %}
+<p><a href="{{ url_for('people_list') }}">&larr; Back to people</a></p>
+<h1>{{ person.name }}</h1>
+{% if person.email %}<p class="person-email">{{ person.email }}</p>{% endif %}
+{% if person.notes %}<p class="person-notes">{{ person.notes }}</p>{% endif %}
+
+<div class="stat-grid">
+    <div class="stat-card">
+        <span class="stat-number">{{ "%.1f"|format(hours_total) }}</span>
+        <span class="stat-label">Total hours volunteered</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-number">£{{ "%.2f"|format(donations_total) }}</span>
+        <span class="stat-label">Total donated</span>
+    </div>
+</div>
+
+<section aria-labelledby="person-hours-heading">
+    <h2 id="person-hours-heading">Volunteer hours</h2>
+    {% if hours %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Activity</th>
+                <th scope="col">Hours</th>
+                <th scope="col">Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for h in hours %}
+            <tr>
+                <td>{{ h.date_logged }}</td>
+                <td>{{ h.activity }}</td>
+                <td>{{ "%.1f"|format(h.hours) }}</td>
+                <td>{{ h.notes or "—" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty-state">No hours logged for {{ person.name }} yet.</p>
+    {% endif %}
+</section>
+
+<section aria-labelledby="person-donations-heading">
+    <h2 id="person-donations-heading">Donations</h2>
+    {% if donations %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Method</th>
+                <th scope="col">Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for d in donations %}
+            <tr>
+                <td>{{ d.date_received }}</td>
+                <td>{{ d.currency }} {{ "%.2f"|format(d.amount) }}</td>
+                <td>{{ d.method or "—" }}</td>
+                <td>{{ d.notes or "—" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty-state">No donations logged for {{ person.name }} yet.</p>
+    {% endif %}
+</section>
+{% endblock %}

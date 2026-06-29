@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Donations — Charity Tracker{% endblock %}
+
+{% block content %}
+<h1>Donations</h1>
+
+{% if not people %}
+<p class="empty-state">You need to <a href="{{ url_for('people_list') }}">add a person</a> before logging donations.</p>
+{% else %}
+<section class="add-form" aria-labelledby="log-donation-heading">
+    <h2 id="log-donation-heading">Log a donation</h2>
+    <form method="post" action="{{ url_for('donations_add') }}">
+        <div class="field-row">
+            <div class="field">
+                <label for="person_id">Donor</label>
+                <select id="person_id" name="person_id" required>
+                    {% for person in people %}
+                    <option value="{{ person.id }}">{{ person.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field">
+                <label for="amount">Amount</label>
+                <input type="number" id="amount" name="amount" step="0.01" min="0.01" required>
+            </div>
+            <div class="field">
+                <label for="currency">Currency</label>
+                <select id="currency" name="currency">
+                    <option value="GBP" selected>GBP (£)</option>
+                    <option value="USD">USD ($)</option>
+                    <option value="EUR">EUR (€)</option>
+                </select>
+            </div>
+        </div>
+        <div class="field-row">
+            <div class="field">
+                <label for="date_received">Date</label>
+                <input type="date" id="date_received" name="date_received" value="{{ today }}" required>
+            </div>
+            <div class="field">
+                <label for="method">Method (optional)</label>
+                <input type="text" id="method" name="method" placeholder="e.g. Bank transfer, cash, JustGiving">
+            </div>
+        </div>
+        <div class="field">
+            <label for="notes">Notes (optional)</label>
+            <input type="text" id="notes" name="notes">
+        </div>
+        <button type="submit">Log donation</button>
+    </form>
+</section>
+{% endif %}
+
+<section aria-labelledby="donations-list-heading">
+    <h2 id="donations-list-heading">All donations ({{ donations|length }})</h2>
+    {% if donations %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Donor</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Method</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for d in donations %}
+            <tr>
+                <td>{{ d.date_received }}</td>
+                <td><a href="{{ url_for('person_detail', person_id=d.person_id) }}">{{ d.person_name }}</a></td>
+                <td>{{ d.currency }} {{ "%.2f"|format(d.amount) }}</td>
+                <td>{{ d.method or "—" }}</td>
+                <td>
+                    <form method="post" action="{{ url_for('donations_delete', entry_id=d.id) }}" class="inline-form"
+                          onsubmit="return confirm('Remove this entry?');">
+                        <button type="submit" class="btn-danger">Remove</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty-state">No donations logged yet.</p>
+    {% endif %}
+</section>
+{% endblock %}
